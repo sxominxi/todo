@@ -2,24 +2,22 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Todo, CreateItemDto } from '@/types/todo';
 import { getItems, addItem } from '@/lib/store';
 
+function extractTenantId(request: NextRequest): string {
+  const segments = request.nextUrl.pathname.split('/');
+  return segments[segments.indexOf('api') + 1];
+}
+
 // GET /api/{tenantId}/items
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { tenantId: string } }
-) {
-  const { tenantId } = params;
+export async function GET(request: NextRequest) {
+  const tenantId = extractTenantId(request);
   return NextResponse.json(getItems(tenantId));
 }
 
 // POST /api/{tenantId}/items
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { tenantId: string } }
-) {
-  const { tenantId } = params;
-  const body = await request.json() as CreateItemDto & { tenantId: string };
+export async function POST(request: NextRequest) {
+  const tenantId = extractTenantId(request);
+  const body = await request.json() as CreateItemDto;
 
-  // 새 아이템 생성
   const newItem: Todo = {
     id: crypto.randomUUID(),
     tenantId,
@@ -30,8 +28,6 @@ export async function POST(
     createdAt: new Date().toISOString()
   };
 
-  // items 배열에 추가
   addItem(tenantId, newItem);
-
   return NextResponse.json(newItem, { status: 201 });
 }
