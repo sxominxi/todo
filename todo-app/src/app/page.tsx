@@ -68,10 +68,6 @@ export default function HomePage() {
     }
   }
 
-  const handleDelete = (id: string) => {
-    setTodos(prev => prev.filter(todo => todo.id !== id));
-  };
-
   const doingTodos = todos.filter(todo => !todo.isCompleted);
   const doneTodos = todos.filter(todo => todo.isCompleted);
 
