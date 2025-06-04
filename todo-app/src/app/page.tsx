@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import { fetchTodoList, createTodoItem, updateTodoItem } from "@/utils/api";
 import { getTenantId } from "@/utils/tenant";
 import { Todo } from "@/types/todo";
-import { v4 as uuidv4 } from "uuid";
 import Link from "next/link";
 import TodoToggle from "@/components/TodoToggle";
 

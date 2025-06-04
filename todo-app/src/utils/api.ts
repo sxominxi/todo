@@ -1,5 +1,4 @@
 import { getTenantId } from "./tenant";
-import type { Todo } from "@/types/todo";
 
 const BASE_URL = "https://assignment-todolist-api.vercel.app/api";
 
