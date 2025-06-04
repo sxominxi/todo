@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Item, UpdateItemDto } from '@/types/todo';
+import { UpdateItemDto } from '@/types/todo';
 import { getItem, updateItem as updateStoreItem, deleteItem as deleteStoreItem } from '@/lib/store';
 
 // GET /api/{tenantId}/items/{itemId}

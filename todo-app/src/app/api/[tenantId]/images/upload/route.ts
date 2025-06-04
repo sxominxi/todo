@@ -1,14 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-// POST /api/{tenantId}/images/upload
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { tenantId: string } }
-) {
+export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
-    const tenantId = formData.get('tenantId') as string;
 
     if (!file) {
       return NextResponse.json(
@@ -17,7 +12,6 @@ export async function POST(
       );
     }
 
-    // 파일 유효성 검사
     if (!file.type.startsWith('image/')) {
       return NextResponse.json(
         { error: 'File must be an image' },
@@ -25,15 +19,13 @@ export async function POST(
       );
     }
 
-    if (file.size > 5 * 1024 * 1024) { // 5MB
+    if (file.size > 5 * 1024 * 1024) {
       return NextResponse.json(
         { error: 'File size must be less than 5MB' },
         { status: 400 }
       );
     }
 
-    // TODO: 실제로는 파일을 클라우드 스토리지에 업로드해야 합니다
-    // 현재는 임시로 base64 문자열을 반환합니다
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
     const base64 = buffer.toString('base64');
@@ -50,4 +42,4 @@ export async function POST(
       { status: 500 }
     );
   }
-} 
+}
