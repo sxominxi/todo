@@ -6,7 +6,7 @@ export default function Header() {
   const router = useRouter();
 
   const handleLogoClick = () => {
-    router.push('/');
+    window.location.href = '/';  // 페이지 새로고침과 함께 홈으로 이동
   };
 
   return (

@@ -6,6 +6,7 @@ import { fetchTodoItem, updateTodoItem, deleteTodoItem, uploadImage } from "@/ut
 import { getTenantId } from "@/utils/tenant";
 import { Todo } from "@/types/todo";
 import TodoToggle from "@/components/TodoToggle";
+import CheckListDetail from "@/components/CheckListDetail";
 
 export default function TodoEditPage() {
   const router = useRouter();
@@ -144,37 +145,25 @@ export default function TodoEditPage() {
   return (
     <div className="h-full">
       <div className="max-w-4xl mx-auto bg-[var(--color-header)] min-h-screen pt-[56px]">
-        <form onSubmit={handleSubmit} className="max-w-2xl mx-auto p-4">
-          <div className="flex justify-center mb-6">
-            <div className={`flex items-center w-full sm:w-[500px] border-2 border-black ${
-              isCompleted ? 'bg-[var(--color-violet100)]' : 'bg-[var(--color-header)]'
-            } h-10 rounded-[30px]`}>
-              <div className="flex items-center justify-center w-full px-6 gap-2">
-                <TodoToggle
-                  isCompleted={isCompleted}
-                  onToggle={handleToggleComplete}
-                />
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className={`bg-transparent border-0 border-b-2 border-black focus:outline-none focus:border-b-[var(--color-slate800)] text-base text-center w-full ${
-                    isCompleted ? 'line-through text-gray-400' : ''
-                  }`}
-                  placeholder="제목을 입력하세요"
-                />
-              </div>
-            </div>
-          </div>
+        <form onSubmit={handleSubmit} className="max-w-3xl mx-auto p-4">
+          {/* 할일 제목 */}
+          <CheckListDetail
+            name={name}
+            isCompleted={isCompleted}
+            onChange={setName}
+            onToggle={handleToggleComplete}
+          />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-4 min-h-[300px] bg-[#f8fafc] flex items-center justify-center">
+          {/* 이미지 추가 & 메모 */}
+          <div className="grid grid-cols-1 md:grid-cols-[2fr_3fr] gap-5 mb-6">
+            {/* 이미지 업로드 영역 */}
+            <div className="relative border-2 border-dashed border-[var(--color-slate300)] rounded-[15px] p-4 h-[250px] bg-[var(--color-slate100)] flex items-center justify-center">
               {imageUrl ? (
                 <>
                   <img
                     src={imageUrl}
                     alt="업로드된 이미지"
-                    className="w-full h-full object-cover rounded-lg"
+                    className="w-auto h-[250px] object-cover rounded-[15px]"
                   />
                   <input
                     type="file"
@@ -189,16 +178,12 @@ export default function TodoEditPage() {
                     className="absolute bottom-4 right-4 bg-transparent rounded-full p-0"
                     title="이미지 변경"
                   >
-                    <img
-                      src="/Type=Edit.png"
-                      alt="이미지 변경"
-                      className="w-12 h-12"
-                    />
+                    <img src="/Type=Edit.png" alt="이미지 변경" className="w-12 h-12" />
                   </button>
                 </>
               ) : (
                 <>
-                  <img src="/img.png" alt="이미지 추가" className="w-16 h-16 opacity-60" />
+                  <img src="/img.png" alt="이미지 추가" className="w-12 h-12" />
                   <input
                     type="file"
                     ref={fileInputRef}
@@ -212,36 +197,33 @@ export default function TodoEditPage() {
                     className="absolute bottom-4 right-4 bg-transparent rounded-full p-0"
                     title="이미지 추가"
                   >
-                    <img
-                      src="/Type=Plus.png"
-                      alt="이미지 추가"
-                      className="w-12 h-12"
-                    />
+                    <img src="/Type=Plus.png" alt="이미지 추가" className="w-12 h-12" />
                   </button>
                 </>
               )}
             </div>
 
-            <div className="bg-[#FFFBEB] rounded-lg p-4 min-h-[300px] flex flex-col relative">
-              <div className="absolute top-4 left-4 flex items-center gap-1">
-                <img src="/memo.png" alt="메모" className="w-4 h-4" />
-                <span className="text-[#B45309] text-sm">Memo</span>
+            {/* 메모 영역 */}
+            <div className="rounded-[15px] h-[250px] flex flex-col relative overflow-hidden">
+              <img
+                src="/memo.png"
+                alt="메모 배경"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute top-6 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center gap-1 z-10">
+                <span className="text-[var(--color-amber800)]  text-16 font-semibold ">Memo</span>
               </div>
+
               <textarea
                 value={memo}
                 onChange={(e) => setMemo(e.target.value)}
-                className="w-full flex-1 bg-transparent border-none resize-none focus:outline-none text-center pt-12"
+                className="w-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-transparent border-none resize-none focus:outline-none text-center pt-12 relative z-10 text-16"
                 placeholder="메모를 입력하세요"
-                style={{
-                  backgroundImage: 'repeating-linear-gradient(transparent, transparent 31px, #E7E5E4 31px, #E7E5E4 32px)',
-                  lineHeight: '32px',
-                  padding: '0 8px'
-                }}
               />
             </div>
           </div>
 
-          <div className="flex gap-4 justify-center">
+          <div className="flex gap-4 justify-center md:justify-end">
             <button
               type="submit"
               className="focus:outline-none"
@@ -250,7 +232,7 @@ export default function TodoEditPage() {
               <img
                 src={isSubmitting ? "/Type=Edit, Size=Large, State=Active.png" : "/Type=Edit, Size=Large, State=Default.png"}
                 alt="수정 완료"
-                className={`w-auto h-10 ${!hasChanges() ? 'opacity-50' : ''}`}
+                className={`w-auto h-10`}
               />
             </button>
             <button
