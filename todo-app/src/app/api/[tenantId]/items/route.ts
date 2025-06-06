@@ -24,8 +24,7 @@ export async function POST(request: NextRequest) {
     name: body.name,
     memo: '',
     imageUrl: '',
-    isCompleted: false,
-    createdAt: new Date().toISOString()
+    isCompleted: false
   };
 
   addItem(tenantId, newItem);
