@@ -204,13 +204,13 @@ export default function TodoEditPage() {
                 className="absolute inset-0 w-full h-full object-cover"
               />
               <div className="absolute top-6 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center gap-1 z-10">
-                <span className="text-[var(--color-amber800)]  text-16 font-semibold ">Memo</span>
+                <span className="text-[var(--color-amber800)]  text-16 font-bold ">Memo</span>
               </div>
 
               <textarea
                 value={memo}
                 onChange={(e) => setMemo(e.target.value)}
-                className="p-5 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-transparent border-none resize-none focus:outline-none text-center relative z-10 text-16 custom-scroll"
+                className="h-full m-3 mt-10 border-none resize-none focus:outline-none text-center relative z-10 text-16 custom-scroll"
                 placeholder="메모를 입력하세요"
               />
             </div>

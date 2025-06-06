@@ -2,9 +2,10 @@
 
 import React, { useState } from "react";
 import { createTodoItem } from "@/utils/api";
+import { Todo } from "@/types/todo";
 
 interface SearchProps {
-  onTodoAdded: (newTodo: any) => void;
+  onTodoAdded: (newTodo: Todo) => void;
   todosCount: number;
 }
 
@@ -38,7 +39,7 @@ export default function Search({ onTodoAdded, todosCount }: SearchProps) {
           className="w-full border-2 border-black bg-[var(--color-slate100)] px-3 py-2 rounded-full mb-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] text-base [var(--color-slate500)] h-12 pl-6"
         />
         <button onClick={handleAddTodo} className="flex items-center justify-center">
-          {todosCount === 0 ? (
+          {input.trim().length > 0 ? (
             <>
               {/* 모바일용 아이콘 */}
               <div className="block sm:hidden h-12 w-auto">
