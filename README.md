@@ -1,5 +1,3 @@
-# 🚧 프로젝트 진행 중입니다.
-
 # Todo App
 
 A simple todo service built with Next.js, TypeScript, and Tailwind CSS.
