@@ -6,10 +6,9 @@ import { Todo } from "@/types/todo";
 
 interface SearchProps {
   onTodoAdded: (newTodo: Todo) => void;
-  todosCount: number;
 }
 
-export default function Search({ onTodoAdded, todosCount }: SearchProps) {
+export default function Search({ onTodoAdded }: SearchProps) {
   const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
 

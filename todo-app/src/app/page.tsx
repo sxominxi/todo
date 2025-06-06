@@ -64,7 +64,7 @@ export default function HomePage() {
   return (
     <main className="max-w-4xl mx-auto p-2 pt-[56px]">
       {/* 할일 추가 */}
-      <Search onTodoAdded={handleTodoAdded} todosCount={todos.length} />
+      <Search onTodoAdded={handleTodoAdded} />
       {/* 할일 목록 */}
       <CheckList
         doingTodos={doingTodos}
