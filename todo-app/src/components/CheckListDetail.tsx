@@ -34,7 +34,7 @@ export default function CheckListDetail({
               onChange={(e) => onChange(e.target.value)}
               className={`border-0 inline-block`}
               placeholder = {placeholder}
-              size = {name.length > 0 ? name.length+1 : placeholder.length+5}
+              size = {name.length > 0 ? name.length+2 : placeholder.length+5}
               style={{ textDecoration: "underline" }}
             />
           </div>

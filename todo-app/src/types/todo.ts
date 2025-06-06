@@ -5,7 +5,6 @@ export interface Todo {
   isCompleted: boolean;
   memo?: string;
   imageUrl?: string;
-  createdAt?: string;
 }
 
 // API 요청/응답을 위한 타입들

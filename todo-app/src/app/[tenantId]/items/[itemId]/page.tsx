@@ -5,7 +5,6 @@ import { useRouter, useParams } from "next/navigation";
 import { fetchTodoItem, updateTodoItem, deleteTodoItem, uploadImage } from "@/utils/api";
 import { getTenantId } from "@/utils/tenant";
 import { Todo } from "@/types/todo";
-import TodoToggle from "@/components/TodoToggle";
 import CheckListDetail from "@/components/CheckListDetail";
 
 export default function TodoEditPage() {
@@ -26,6 +25,9 @@ export default function TodoEditPage() {
   const [imageUrl, setImageUrl] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
 
   useEffect(() => {
     if (!tenantId || !itemId) {
@@ -54,37 +56,28 @@ export default function TodoEditPage() {
     return (
       name !== originalTodo.name ||
       memo !== (originalTodo.memo || "") ||
-      imageUrl !== (originalTodo.imageUrl || "")
+      selectedFile !== null // 이미지 변경 여부는 이걸로만 판단
     );
   };
 
-  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // 파일 이름 검증
     if (!/^[a-zA-Z0-9._-]+$/.test(file.name)) {
-      setError("파일 이름은 영문자만 사용 가능합니다.");
+      alert("파일 이름은 영문자만 사용 가능합니다.");
       return;
     }
 
-    // 파일 크기 검증 (5MB)
     if (file.size > 5 * 1024 * 1024) {
-      setError("파일 크기는 5MB 이하여야 합니다.");
+      alert("파일 크기는 5MB 이하여야 합니다.");
       return;
     }
 
-    const formData = new FormData();
-    formData.append("image", file);
-
-    try {
-      const result = await uploadImage(tenantId, formData);
-      setImageUrl(result.imageUrl);
-      setError(null);
-    } catch (err) {
-      console.error("❌ 이미지 업로드 실패:", err);
-      setError("이미지 업로드에 실패했습니다.");
-    }
+    setSelectedFile(file);
+    // 미리보기 URL 생성
+    const preview = URL.createObjectURL(file);
+    setPreviewUrl(preview);
   }
 
   async function handleDelete() {
@@ -102,20 +95,30 @@ export default function TodoEditPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!hasChanges()) {
-      router.push(`/${tenantId}/items/${itemId}`);
+      router.push(`/`);
       return;
     }
 
     setError(null);
     setIsSubmitting(true);
     try {
+      let finalImageUrl = imageUrl;
+
+      // 새 이미지가 선택된 경우에만 업로드
+      if (selectedFile) {
+        const formData = new FormData();
+        formData.append("image", selectedFile);
+        const result = await uploadImage(tenantId, formData);
+        finalImageUrl = result.url; // ✅
+      }
+
       await updateTodoItem(tenantId, itemId, { 
         name,
         memo,
-        imageUrl
+        imageUrl: finalImageUrl
       });
 
-      router.push(`/${tenantId}/items/${itemId}`);
+      router.push(`/`);
     } catch (err) {
       console.error("❌ 수정 실패:", err);
       setError("수정에 실패했습니다.");
@@ -157,50 +160,40 @@ export default function TodoEditPage() {
           {/* 이미지 추가 & 메모 */}
           <div className="grid grid-cols-1 md:grid-cols-[2fr_3fr] gap-5 mb-6">
             {/* 이미지 업로드 영역 */}
-            <div className="relative border-2 border-dashed border-[var(--color-slate300)] rounded-[15px] p-4 h-[250px] bg-[var(--color-slate100)] flex items-center justify-center">
-              {imageUrl ? (
-                <>
-                  <img
-                    src={imageUrl}
-                    alt="업로드된 이미지"
-                    className="w-auto h-[250px] object-cover rounded-[15px]"
-                  />
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleImageUpload}
-                    accept="image/*"
-                    className="hidden"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="absolute bottom-4 right-4 bg-transparent rounded-full p-0"
-                    title="이미지 변경"
-                  >
-                    <img src="/Type=Edit.png" alt="이미지 변경" className="w-12 h-12" />
-                  </button>
-                </>
+            <div className={`relative rounded-[15px] h-[250px] bg-[var(--color-slate100)] overflow-hidden flex items-center justify-center ${previewUrl || imageUrl? '': 'border-2 border-dashed border-[var(--color-slate300)]'}`}>
+              {previewUrl || imageUrl ? (
+                <img
+                  src={previewUrl || imageUrl}
+                  alt="업로드된 이미지"
+                  className="w-full h-full object-cover"
+                />
               ) : (
-                <>
-                  <img src="/img.png" alt="이미지 추가" className="w-12 h-12" />
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleImageUpload}
-                    accept="image/*"
-                    className="hidden"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="absolute bottom-4 right-4 bg-transparent rounded-full p-0"
-                    title="이미지 추가"
-                  >
-                    <img src="/Type=Plus.png" alt="이미지 추가" className="w-12 h-12" />
-                  </button>
-                </>
+                <img
+                  src="/img.png"
+                  alt="기본 이미지"
+                  className="w-10 h-10"
+                />
               )}
+
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleImageSelect}
+                accept="image/*"
+                className="hidden"
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="absolute bottom-4 right-4 bg-transparent rounded-full p-0"
+                title={previewUrl || imageUrl ? "이미지 변경" : "이미지 추가"}
+              >
+                <img
+                  src={previewUrl || imageUrl ? "/Type=Edit.png" : "/Type=Plus.png"}
+                  alt="이미지 버튼"
+                  className="w-12 h-12"
+                />
+              </button>
             </div>
 
             {/* 메모 영역 */}
@@ -217,7 +210,7 @@ export default function TodoEditPage() {
               <textarea
                 value={memo}
                 onChange={(e) => setMemo(e.target.value)}
-                className="w-full absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-transparent border-none resize-none focus:outline-none text-center pt-12 relative z-10 text-16"
+                className="p-5 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-transparent border-none resize-none focus:outline-none text-center relative z-10 text-16 custom-scroll"
                 placeholder="메모를 입력하세요"
               />
             </div>
@@ -230,9 +223,13 @@ export default function TodoEditPage() {
               disabled={isSubmitting || !hasChanges()}
             >
               <img
-                src={isSubmitting ? "/Type=Edit, Size=Large, State=Active.png" : "/Type=Edit, Size=Large, State=Default.png"}
+                src={
+                  isSubmitting || hasChanges()
+                    ? "/Type=Edit, Size=Large, State=Active.png"
+                    : "/Type=Edit, Size=Large, State=Default.png"
+                }
                 alt="수정 완료"
-                className={`w-auto h-10`}
+                className="w-auto h-10"
               />
             </button>
             <button
